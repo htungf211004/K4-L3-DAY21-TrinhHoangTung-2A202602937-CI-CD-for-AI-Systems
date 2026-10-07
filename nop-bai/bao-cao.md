@@ -44,7 +44,7 @@ Holdout có 24.8% mẫu thu nhập trên 50K. Dự đoán toàn bộ là thu nh�
 
 | | f1_score | accuracy |
 |---|---|---|
-| Bước 2 (chỉ `train_batch1`) | 0.7149 | 0.8740 |
-| Bước 3 (thêm `train_batch2`) | 0.7354 | 0.8820 |
+| Bước 2 (chỉ `train_batch1`) | 0.714932 | 0.874000 |
+| Bước 3 (thêm `train_batch2`) | 0.735426 | 0.882000 |
 
-**Nhận xét:** Số liệu từ log Train của run #1 và #2 được làm tròn bốn chữ số; F1 tăng 0.0205, accuracy tăng 0.0080 khi train tăng lên 44.722 mẫu, nhưng không thể kết luận thêm dữ liệu luôn tốt hơn trên mọi tập đánh giá. Commit dữ liệu `f47b291` tự động kích hoạt cả bốn job thành công, qua ngưỡng 0.65 và triển khai lại mà không cần restart thủ công. Model trên VM đổi mã băm và khớp S3; `/healthz` trả `ok`, `/score` trả nhãn hợp lệ.
+**Nhận xét:** Số liệu lấy từ `report.json` trong Artifacts của run #1 và #2, làm tròn sáu chữ số; F1 tăng 0.020494 và accuracy tăng 0.008 khi train tăng từ 22.361 lên 44.722 mẫu. Hai batch cùng nguồn và phân phối nên mức cải thiện trên holdout còn hạn chế; kết quả này không chứng minh thêm dữ liệu luôn tốt hơn. Commit dữ liệu `f47b291` tự động chạy thành công cả bốn job, qua ngưỡng 0.65 và triển khai lại; model trên VM đổi mã băm, khớp S3, `/healthz` trả `ok` và `/score` trả nhãn hợp lệ.
