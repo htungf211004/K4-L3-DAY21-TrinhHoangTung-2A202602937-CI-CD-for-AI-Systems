@@ -365,3 +365,42 @@ Xem phần xử lý sự cố chi tiết trong từng file hướng dẫn:
 ---
 
 Bắt đầu: [Bước 1 - Thực nghiệm cục bộ](tasks/buoc-1.md)
+
+## Chạy MLflow Cục Bộ Trên Windows Trong Repo Này
+
+Từ thư mục gốc của repo, cấu hình tracking SQLite và experiment có artifact nằm trong
+`mlartifacts/`, rồi chạy bằng Python của môi trường ảo:
+
+```powershell
+$env:MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+$env:MLFLOW_ARTIFACT_ROOT = "./mlartifacts"
+$env:MLFLOW_EXPERIMENT_NAME = "Day21-Local-Experiments"
+.venv\Scripts\python.exe src/train.py
+.venv\Scripts\mlflow.exe ui --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlartifacts --host 127.0.0.1 --port 5000
+```
+
+Mở `http://localhost:5000` và chọn experiment `Day21-Local-Experiments`.
+Hiện các cột `f1_score`, `accuracy`, `n_estimators`, `learning_rate`, `max_depth`,
+rồi sắp xếp theo `f1_score` giảm dần. Kết quả thực nghiệm được ghi ở mục 1 của
+[báo cáo](nop-bai/bao-cao.md); `params.yaml` chứa cấu hình được chọn.
+
+Repo ghim SQLAlchemy `2.0.30` để tránh lỗi import `FallbackAsyncAdaptedQueuePool`
+của MLflow `2.13.0` khi sử dụng SQLAlchemy `2.1.3`.
+
+Pipeline AWS giữ bốn jobs và năm secrets trong `tasks/buoc-2.md`:
+`STORAGE_CREDENTIALS` là JSON chứa `aws_access_key_id`, `aws_secret_access_key`
+(và `aws_session_token` nếu dùng credentials tạm thời); các secrets còn lại là
+`ARTIFACT_BUCKET`, `SERVER_HOST`, `SERVER_USER`, `SERVER_SSH_KEY`.
+Repository variable `AWS_REGION` mặc định là `us-east-1`.
+Model được upload vào S3 trong Release, sau khi Quality Gate thành công,
+để model không đạt F1 không ghi đè model đang phục vụ. Deploy dùng SSH đúng khung lab.
+
+VM của lab là `income-api-day21` tại `us-east-1`, Ubuntu 22.04, `t3.micro`,
+gp3 8 GiB mã hóa và CPU Standard. Service `income-api` dùng Python trong
+`/home/ubuntu/venv`, mã tại `/home/ubuntu/src/serve.py` và instance role
+`Day21EC2ModelReader` chỉ đọc `artifacts/current/model.joblib` trong bucket
+`day21-income-trinhhoangtung-20261007`. Không lưu AWS access key trên VM.
+Cổng 8080 chỉ cho IP người học; cổng SSH 22 mở tạm cho pipeline dùng key.
+Sau khi hoàn thành lab, cần đóng SSH công khai và dừng hoặc xóa VM khi không dùng.
+Free Plan dùng credits cho EC2/EBS/IPv4, không phải miễn phí vô hạn;
+IP tự cấp có thể đổi sau khi stop/start, khi đó cần cập nhật `SERVER_HOST`.

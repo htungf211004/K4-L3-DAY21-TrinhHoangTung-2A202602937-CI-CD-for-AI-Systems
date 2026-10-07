@@ -13,11 +13,11 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 
 | | |
 |---|---|
-| Họ và tên | ___ |
-| MSSV | ___ |
+| Họ và tên | Trịnh Hoàng Tùng |
+| MSSV | 2A202602937 |
 | Lớp / Khóa | K4 |
-| Repo GitHub | https://github.com/___/___ |
-| Ngày nộp | ___ |
+| Repo GitHub | https://github.com/htungf211004/K4-L3-DAY21-TrinhHoangTung-2A202602937-CI-CD-for-AI-Systems |
+| Ngày nộp | Chưa nộp; thực nghiệm Bước 1 ngày 07/10/2026. |
 
 ---
 
@@ -27,13 +27,13 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 
 | Lần chạy | n_estimators | learning_rate | max_depth | f1_score | accuracy |
 |---|---|---|---|---|---|
-| 1 | ___ | ___ | ___ | ___ | ___ |
-| 2 | ___ | ___ | ___ | ___ | ___ |
-| 3 | ___ | ___ | ___ | ___ | ___ |
+| 1 | 100 | 0.1 | 3 | 0.710900 | 0.878000 |
+| 2 | 50 | 0.05 | 2 | 0.605128 | 0.846000 |
+| 3 | 200 | 0.1 | 5 | 0.714932 | 0.874000 |
 
-**Bộ siêu tham số đã chọn:** `n_estimators=___`, `learning_rate=___`, `max_depth=___`.
+**Bộ siêu tham số đã chọn:** `n_estimators=200`, `learning_rate=0.1`, `max_depth=5`.
 
-**Lý do:** ___
+**Lý do:** Lần 3 có F1 cao nhất, vượt ngưỡng 0.65; lần 2 không đạt ngưỡng. Accuracy cao nhất thuộc lần 1, chứng tỏ tối ưu accuracy không đồng nghĩa với tối ưu lớp thu nhập cao. Cấu hình ít cây, learning rate thấp và độ sâu nhỏ đạt F1 thấp hơn; giảm learning rate thường cần tăng số cây để bù lại. Tuy nhiên, ba thí nghiệm thay đổi nhiều tham số cùng lúc nên chưa tách được ảnh hưởng riêng của từng tham số. Cả ba dùng 22.361 mẫu train, 500 mẫu holdout và random_state=42. Số liệu được đối chiếu với MLflow SQLite. Ảnh `01-mlflow-ui.png` do người học chụp hiển thị đủ ba cấu hình, hai độ đo và thứ tự F1 giảm dần.
 
 <!--
 Trả lời trong phần Lý do:
@@ -49,7 +49,7 @@ Trả lời trong phần Lý do:
 
 <!-- Khoảng 120 - 150 từ. -->
 
-___
+Holdout có 24.8% mẫu thu nhập trên 50K, còn lại là lớp thu nhập thấp. Dự đoán toàn bộ là thu nhập thấp vẫn đạt accuracy 0.752 nhưng F1 lớp dương bằng 0, vì không nhận diện được người thu nhập cao nào. F1 kết hợp precision và recall của lớp dương, phản ánh cả dự đoán nhầm và bỏ sót lớp này. Vì vậy quality gate dùng F1 >= 0.65, còn accuracy chỉ để tham khảo. Mã gọi `f1_score(y_eval, preds)` với mặc định `pos_label=1`. Weighted F1 bị chi phối bởi lớp đa số; macro F1 cho hai lớp trọng số bằng nhau nhưng vẫn đo trung bình hai lớp, khác mục tiêu F1 riêng cho lớp dương của lab.
 
 <!--
 Cần nêu được:
@@ -68,9 +68,9 @@ Cần nêu được:
 
 | Khó khăn | Nguyên nhân | Cách giải quyết |
 |---|---|---|
-| ___ | ___ | ___ |
-| ___ | ___ | ___ |
-| ___ | ___ | ___ |
+| MLflow không mở được SQLite. | SQLAlchemy 2.1.3 bỏ lớp MLflow 2.13 đang import. | Cài và ghim SQLAlchemy 2.0.30. |
+| Tải dependency bị timeout. | Đường truyền tới PyPI chậm. | Thử lại với timeout 120 giây; cài thành công. |
+| Chọn cấu hình EC2 tiết kiệm và cấp quyền S3 phù hợp. | Nhãn Free Tier không có nghĩa mọi tài khoản được miễn phí vô hạn. | Kiểm tra Free Plan và credits trên Console; dùng t3.micro CPU Standard, gp3 mã hóa và role chỉ đọc đúng model. |
 
 ---
 

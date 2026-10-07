@@ -1,5 +1,9 @@
 mlflow.db
+mlflow-ui.*.log
 mlartifacts/
+mlruns/
+*.pem
+*.key
 models/
 outputs/
 data/train_batch1.csv

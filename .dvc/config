@@ -1,0 +1,5 @@
+[core]
+    remote = labstore
+['remote "labstore"']
+    url = s3://day21-income-trinhhoangtung-20261007/dvc
+    region = us-east-1
